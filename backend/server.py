@@ -5,10 +5,14 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-# Paths
-BASE_DIR = os.path.dirname(__file__)
-DATA_FILE = os.path.join(BASE_DIR, '../data/library_data.json')
-CSV_FILE = os.path.join(BASE_DIR, '../data/video_games.csv')
+# NEW ROBUST PATHING
+# This finds the root directory of the project, two levels up from server.py's location
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+DATA_FOLDER = os.path.join(PROJECT_ROOT, 'data') # This is the correct relative path to the data folder
+
+# Define file paths relative to the data folder
+DATA_FILE = os.path.join(DATA_FOLDER, 'library_data.json')
+CSV_FILE = os.path.join(DATA_FOLDER, 'video_games.csv')
 
 def load_data():
     if not os.path.exists(DATA_FILE):
