@@ -5,14 +5,11 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-# NEW ROBUST PATHING
-# This finds the root directory of the project, two levels up from server.py's location
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-DATA_FOLDER = os.path.join(PROJECT_ROOT, 'data') # This is the correct relative path to the data folder
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
-# Define file paths relative to the data folder
-DATA_FILE = os.path.join(DATA_FOLDER, 'library_data.json')
-CSV_FILE = os.path.join(DATA_FOLDER, 'video_games.csv')
+# Define file paths relative to the project root
+DATA_FILE = os.path.join(PROJECT_ROOT, 'data', 'library_data.json')
+CSV_FILE = os.path.join(PROJECT_ROOT, 'data', 'video_games.csv')
 
 def load_data():
     if not os.path.exists(DATA_FILE):
@@ -30,6 +27,7 @@ def save_data(data):
 
 def import_csv_data():
     data = {}
+    print(f">> DIAGNOSTIC: Checking for CSV at path: {CSV_FILE}")
     try:
         with open(CSV_FILE, 'r', encoding='utf-8', errors='replace') as f:
             reader = csv.DictReader(f)
