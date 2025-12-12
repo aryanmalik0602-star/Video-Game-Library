@@ -3498,5 +3498,12 @@
         "publisher": "User Rating: 8.5",
         "date": "September 3, 2013",
         "category": "PC"
+    },
+    "GTAA5": {
+        "name": "GTAA5",
+        "author": "Manual",
+        "publisher": "N/A",
+        "category": "PC",
+        "date": "2025"
     }
 }
