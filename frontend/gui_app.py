@@ -272,36 +272,62 @@ class NeonLibraryApp:
         self.details_text.config(state="disabled")
 
     def add_game(self):
-        # Bring main window to front
-        self.root.lift()
-        self.root.attributes('-topmost', True)
-        self.root.after_idle(self.root.attributes, '-topmost', False)
+        # Create a simple upload window
+        upload_window = tk.Toplevel(self.root)
+        upload_window.title("UPLOAD GAME")
+        upload_window.geometry("350x200")
+        upload_window.configure(bg=C_VOID)
+        upload_window.resizable(False, False)
         
-        # Open file dialog for CSV upload
-        file_path = filedialog.askopenfilename(
-            parent=self.root,
-            title="Upload Game Data (CSV)",
-            filetypes=[("CSV files", "*.csv"), ("All files", "*.*")]
-        )
+        # Make window stay on top
+        upload_window.attributes('-topmost', True)
         
-        if file_path and os.path.exists(file_path):
+        # Title
+        title_label = tk.Label(upload_window, text="ADD NEW GAME", font=("Consolas", 14, "bold"), 
+                               fg=C_CYAN, bg=C_VOID)
+        title_label.pack(pady=15)
+        
+        # Game Name Label
+        name_label = tk.Label(upload_window, text="GAME NAME:", font=("Consolas", 10), 
+                              fg=C_CYAN, bg=C_VOID)
+        name_label.pack(pady=(10, 5), padx=20, anchor="w")
+        
+        # Game Name Input
+        name_entry = tk.Entry(upload_window, font=("Consolas", 10), bg=C_GRID, fg=C_TEXT, 
+                              insertbackground=C_CYAN, width=30)
+        name_entry.pack(pady=5, padx=20)
+        name_entry.focus()
+        
+        def upload_game():
+            game_name = name_entry.get().strip()
+            if not game_name:
+                messagebox.showwarning("WARNING", "Please enter a game name!", parent=upload_window)
+                return
+            
             try:
-                # Read CSV and upload each row
-                with open(file_path, 'r', encoding='utf-8') as f:
-                    reader = csv.DictReader(f)
-                    for row in reader:
-                        game_data = {
-                            "name": row.get("name", "Unknown"),
-                            "author": row.get("author", "Unknown"),
-                            "publisher": row.get("publisher", "N/A"),
-                            "category": row.get("category", "PC"),
-                            "date": row.get("date", "2025")
-                        }
-                        requests.post(API_URL, json=game_data)
-                messagebox.showinfo("SUCCESS", f"Games uploaded from {os.path.basename(file_path)}")
+                # Upload game with default values
+                game_data = {
+                    "name": game_name,
+                    "author": "Unknown",
+                    "publisher": "N/A",
+                    "category": "PC",
+                    "date": "2025"
+                }
+                requests.post(API_URL, json=game_data)
+                messagebox.showinfo("SUCCESS", f"Game '{game_name}' added!", parent=upload_window)
+                upload_window.destroy()
                 self.refresh_list()
             except Exception as e:
-                messagebox.showerror("ERROR", f"Failed to upload: {str(e)}")
+                messagebox.showerror("ERROR", f"Failed to upload: {str(e)}", parent=upload_window)
+        
+        # Upload Button
+        upload_btn = tk.Button(upload_window, text="UPLOAD", font=("Consolas", 11, "bold"), 
+                               bg=C_YELLOW, fg=C_VOID, command=upload_game, cursor="hand2", 
+                               activebackground=C_CYAN, activeforeground=C_VOID, bd=2)
+        upload_btn.pack(pady=15, padx=20, fill="x")
+        
+        # Allow Enter key to upload
+        name_entry.bind("<Return>", lambda e: upload_game())
 
     def delete_game(self):
         sel = self.game_list.curselection()
