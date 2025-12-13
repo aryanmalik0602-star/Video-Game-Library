@@ -79,15 +79,23 @@ class NeonLibraryApp:
                               bd=0, command=root.destroy, activebackground=C_MAGENTA)
         btn_close.pack(side="right", padx=10)
 
-        # --- SEARCH SECTION ---
-        self.canvas.create_text(60, 80, text="DATABASE SCAN", fill=C_CYAN, anchor="w", font=("Consolas", 11))
+        # Search Variable
         self.search_var = tk.StringVar()
-        
+        # NOTE: The KeyRelease bind below is sufficient. The trace_add often causes conflicts 
+        # that prevent typing, so it must be commented out.
+        # self.search_var.trace_add("write", self.live_search) 
+
         # KEY CHANGE: Bind the KeyRelease event
         self.entry_search = tk.Entry(root, textvariable=self.search_var, bg=C_DIM, fg=C_CYAN, insertbackground=C_CYAN, 
                                 font=("Consolas", 14), bd=0)
         self.entry_search.place(x=60, y=100, width=300, height=30)
+        
+        # This is the correct, primary binding:
         self.entry_search.bind('<KeyRelease>', self.live_search)
+        
+        # Explicitly ensure the field is enabled and focused for the user
+        self.entry_search.config(state='normal')
+        self.entry_search.focus_set()
         
         NeonCanvasButton(root, "SCAN LIBRARY", self.force_search, color=C_CYAN).place(x=380, y=95)
 

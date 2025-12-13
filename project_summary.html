@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Programming Project Summary</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.8;
+            margin: 0;
+            padding: 0;
+            background-color: #121212; /* Very dark background */
+            color: #E0E0E0; /* Light gray text */
+            transition: background-color 0.5s;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: #1e1e1e; /* Slightly lighter container background */
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            color: #03dac6; /* Neon Teal Accent */
+            border-bottom: 3px solid #03dac6;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        h2 {
+            color: #bb86fc; /* Light Purple Accent */
+            margin-top: 30px;
+            border-left: 4px solid #bb86fc;
+            padding-left: 10px;
+            font-weight: 400;
+        }
+
+        p, ul {
+            font-size: 1.05em;
+            text-align: justify;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.9em;
+            background-color: #2a2a2a;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #3a3a3a;
+        }
+        th {
+            background-color: #3f3f3f;
+            color: #ffffff;
+            font-weight: 500;
+        }
+        tr:hover {
+            background-color: #333333;
+        }
+
+        .image-gallery {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .image-box {
+            width: 48%;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .image-box img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 2px solid #03dac6;
+            box-shadow: 0 0 15px rgba(3, 218, 198, 0.4);
+        }
+
+        figcaption {
+            margin-top: 10px;
+            font-size: 0.95em;
+            color: #999;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <h1>Project Summary: Library Management System</h1>
+
+        <p>
+            This project successfully developed and implemented a Library Management System (LMS) that utilizes a Client-Server Architecture for robust and scalable media metadata management.
+        </p>
+
+        <h2>1. Architectural Core</h2>
+        <p>The system is fundamentally decoupled, ensuring modularity and maintainability:</p>
+        <ul>
+            <li><strong>Backend (Application Tier):</strong> A Python Flask API serves as the application logic layer, handling all data processing, validation, and persistence requests.</li>
+            <li><strong>Frontend (Presentation Tier):</strong> A Python Tkinter GUI acts as the dedicated client, providing the user interface and consuming the API exclusively via HTTP requests.</li>
+        </ul>
+
+        <h2>2. Technical Features and Implementation</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature Area</th>
+                    <th>Key Technology</th>
+                    <th>Implementation Detail</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Data Persistence</td>
+                    <td>SQLite / SQLAlchemy</td>
+                    <td>Replaced flat file storage. Uses the Media model for structured, reliable, and scalable storage, ensuring full transactional integrity.</td>
+                </tr>
+                <tr>
+                    <td>API Contract</td>
+                    <td>Flask REST API</td>
+                    <td>Implements six core endpoints covering all CRUD and filtering requirements (List All, Filter by Category, Search by Name, Create, Delete). All responses are standardized JSON.</td>
+                </tr>
+                <tr>
+                    <td>Concurrency</td>
+                    <td>Threading &amp; Locks</td>
+                    <td>The Flask server runs in a separate daemon thread from the Tkinter GUI. A database lock is used around commit operations for thread-safe SQLite access.</td>
+                </tr>
+                <tr>
+                    <td>Media Categories</td>
+                    <td>Category Field</td>
+                    <td>The system supports and validates three distinct media types: Book, Film, and Magazine.</td>
+                </tr>
+                <tr>
+                    <td>Client Interface</td>
+                    <td>Tkinter GUI</td>
+                    <td>Provides a responsive interface with a ttk.Treeview for list display, filtering controls, and custom dialogs for creation.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>3. Functional Capabilities</h2>
+        <p>The final system offers the following user functionalities:</p>
+        <ul>
+            <li>**Read:** Display a comprehensive list of all media items.</li>
+            <li>**Filter:** List items by specific categories (Book, Film, Magazine).</li>
+            <li>**Search:** Find an item by exact title match.</li>
+            <li>**Create:** Add a new media item (Book, Film, or Magazine) via a dedicated dialog.</li>
+            <li>**Delete:** Permanently remove an item from the database.</li>
+        </ul>
+        
+        <p>In summary, the project successfully moved from a basic concept to a highly professional, technically sound multi-tiered application, fulfilling all advanced programming requirements.</p>
+
+        <div class="image-gallery">
+            <figure class="image-box">
+                <img src="gui_screenshot.png" alt="Screenshot of the Tkinter GUI application running">
+                <figcaption>GUI: Frontend User Interface (Presentation Tier)</figcaption>
+            </figure>
+            <figure class="image-box">
+                <img src="code_structure.png" alt="Code structure showing backend and frontend separation">
+                <figcaption>Code: Client-Server Architecture Proof (Application Tier)</figcaption>
+            </figure>
+        </div>
+
+    </div>
+
+</body>
+</html>
