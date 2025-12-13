@@ -13,7 +13,11 @@ This terminal must remain open and running.
 
 STEP 2: START THE FRONTEND GUI (Terminal 2)
 After the server shows "Running on http://127.0.0.1:5000", run the client in the second terminal.
-
     python3 frontend/gui_app.py
 
+
 The graphical application window will then open and be populated with data
+
+
+curl http://127.0.0.1:5000/media/search/Batman | python3 -m json.tool 
+#to search data from the data set on cli 

@@ -32,6 +32,7 @@ class NeonCanvasButton(tk.Canvas):
         self.bind("<Enter>", self.on_enter)
         self.bind("<Leave>", self.on_leave)
         self.bind("<Button-1>", self.on_click)
+        self.config(takefocus=0)
 
     def on_enter(self, e):
         self.itemconfig(self.rect, width=2, fill=self.color)
@@ -52,6 +53,7 @@ class NeonLibraryApp:
         self.root.geometry("1150x750")
         self.root.overrideredirect(True) 
         self.root.configure(bg=C_VOID)
+        self.root.wm_attributes("-topmost", True) 
 
         self._offsetx = 0
         self._offsety = 0
@@ -63,6 +65,7 @@ class NeonLibraryApp:
         
         self.canvas.create_line(20, 50, 20, 730, fill=C_DIM, width=2)
         self.canvas.create_line(1130, 50, 1130, 730, fill=C_DIM, width=2)
+        self.canvas.config(takefocus=0)
         
         # --- TITLE BAR ---
         self.title_bar = tk.Frame(root, bg=C_VOID, height=40)
@@ -81,24 +84,22 @@ class NeonLibraryApp:
 
         # Search Variable
         self.search_var = tk.StringVar()
-        # NOTE: The KeyRelease bind below is sufficient. The trace_add often causes conflicts 
-        # that prevent typing, so it must be commented out.
-        # self.search_var.trace_add("write", self.live_search) 
+        
+        # --- SEARCH WIDGETS ---
+        search_frame = tk.Frame(root, bg=C_VOID)
+        search_frame.place(x=60, y=95, height=40, width=500) 
 
-        # KEY CHANGE: Bind the KeyRelease event
-        self.entry_search = tk.Entry(root, textvariable=self.search_var, bg=C_DIM, fg=C_CYAN, insertbackground=C_CYAN, 
+        self.entry_search = tk.Entry(search_frame, textvariable=self.search_var, bg=C_DIM, fg=C_CYAN, insertbackground=C_CYAN, 
                                 font=("Consolas", 14), bd=0)
-        self.entry_search.place(x=60, y=100, width=300, height=30)
-        
-        # This is the correct, primary binding:
-        self.entry_search.bind('<KeyRelease>', self.live_search)
-        
-        # Explicitly ensure the field is enabled and focused for the user
-        self.entry_search.config(state='normal')
-        self.entry_search.focus_set()
-        
-        NeonCanvasButton(root, "SCAN LIBRARY", self.force_search, color=C_CYAN).place(x=380, y=95)
+        self.entry_search.pack(side="left", padx=0, pady=5, fill="x", expand=False)
+        self.entry_search.config(width=28, takefocus=1) # Ensure it CAN take focus
 
+        # REMOVE KeyRelease binding from entry itself - we will bind root instead
+
+        self.entry_search.config(state='normal')
+        
+        NeonCanvasButton(search_frame, "SCAN LIBRARY", self.force_search, color=C_CYAN).pack(side="left", padx=(10,0))
+        
         # --- LIST SECTION ---
         self.canvas.create_line(60, 150, 400, 150, fill=C_CYAN, width=1)
         self.list_frame = tk.Frame(root, bg=C_VOID)
@@ -115,12 +116,17 @@ class NeonLibraryApp:
         
         self.details_text = tk.Text(root, bg=C_VOID, fg=C_CYAN, font=("Courier New", 10, "bold"), bd=0, highlightthickness=0)
         self.details_text.place(x=470, y=180, width=590, height=440)
+        self.details_text.config(takefocus=0)
 
         # --- FOOTER ---
         NeonCanvasButton(root, "UPLOAD DATA", self.add_game, color=C_YELLOW).place(x=60, y=670)
         NeonCanvasButton(root, "PURGE DATA", self.delete_game, color=C_MAGENTA).place(x=240, y=670)
         NeonCanvasButton(root, "REFRESH ALL", self.refresh_list, color=C_TEXT).place(x=950, y=670)
 
+        # FINAL AGGRESSIVE FOCUS SETTING & KEY HANDLER
+        self.root.bind('<Key>', self.handle_keypress)
+        root.after(10, self.entry_search.focus_set)
+        
         self.refresh_list()
 
     def draw_grid(self, w, h):
@@ -135,6 +141,54 @@ class NeonLibraryApp:
         x = self.root.winfo_x() + event.x - self._offsetx
         y = self.root.winfo_y() + event.y - self._offsety
         self.root.geometry(f'+{x}+{y}')
+
+    # --- KEYBOARD LOGIC HANDLERS ---
+    
+    def handle_keypress(self, event):
+        """Manually manages key input for the search bar when the root window is focused."""
+        char = event.char
+        keysym = event.keysym
+        entry = self.entry_search
+        
+        # 1. Handle regular printable characters (typing)
+        if len(char) == 1 and char.isprintable():
+            # Get current text, insert character at the cursor position (insertion point)
+            text = entry.get()
+            cursor_pos = entry.index(tk.INSERT)
+            new_text = text[:cursor_pos] + char + text[cursor_pos:]
+            self.search_var.set(new_text)
+            entry.icursor(cursor_pos + 1) # Move cursor one position right
+            self.live_search()
+        
+        # 2. Handle Backspace (Deletion)
+        elif keysym == 'BackSpace' or keysym == 'Delete':
+            text = entry.get()
+            cursor_pos = entry.index(tk.INSERT)
+            
+            # Backspace deletes left, Delete deletes right
+            if keysym == 'BackSpace' and cursor_pos > 0:
+                new_text = text[:cursor_pos-1] + text[cursor_pos:]
+                self.search_var.set(new_text)
+                entry.icursor(cursor_pos - 1)
+            elif keysym == 'Delete' and cursor_pos < len(text):
+                new_text = text[:cursor_pos] + text[cursor_pos+1:]
+                self.search_var.set(new_text)
+                # Cursor position doesn't change for Delete
+            
+            self.live_search()
+        
+        # 3. Handle Cursor Movement (Optional, but helps user experience)
+        elif keysym == 'Left':
+            entry.icursor(entry.index(tk.INSERT) - 1)
+        elif keysym == 'Right':
+            entry.icursor(entry.index(tk.INSERT) + 1)
+            
+        # 4. Handle Escape (Clear)
+        elif keysym == 'Escape':
+            self.search_var.set("")
+            self.live_search()
+
+        return 'break' # Stop event propagation to prevent it being processed elsewhere
 
     # --- LOGIC ---
     
@@ -151,25 +205,21 @@ class NeonLibraryApp:
         for item in sorted_items:
             self.game_list.insert(tk.END, item['name'])
 
-    # NEW: Triggers on every keypress
     def live_search(self, event=None):
+        """Performs the search based on the current text in search_var."""
         name = self.search_var.get()
         if not name: 
-            # If empty, show everything again
             self.refresh_list()
             return
 
         try:
-            # Backend now returns a list of matches!
             r = requests.get(f"{API_URL}/search/{name}")
             if r.status_code == 200:
                 results = r.json()
                 self.game_list.delete(0, tk.END)
-                # Populate list with all matches
                 for item in results:
                     self.game_list.insert(tk.END, item['name'])
             else:
-                # If backend returns empty list or error (e.g. 404 in old version), clear list
                 self.game_list.delete(0, tk.END)
         except: 
             pass
@@ -184,8 +234,6 @@ class NeonLibraryApp:
             if not sel: return
             name = self.game_list.get(sel[0])
             try:
-                # Need to find the exact item details. 
-                # Since we might have filtered the list, we fetch by unique name ID from backend.
                 r = requests.get(f"{API_URL}/item/{name}")
                 if r.status_code == 200:
                     item = r.json()
