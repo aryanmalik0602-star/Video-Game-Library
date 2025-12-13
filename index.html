@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Game Library Project</title>
+    <style>
+        /* Base Styles and Dark Theme */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a2e; /* Deep space blue/dark background */
+            color: #e0e0ff; /* Light text color */
+            transition: background-color 0.5s;
+        }
+
+        /* Container for main content */
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #2c3855; /* Slightly lighter container background */
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            color: #8c8cff; /* Light blue/purple accent */
+            border-bottom: 3px solid #5a5ac6;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        p {
+            font-size: 1.1em;
+            text-align: justify;
+        }
+
+        /* --- Menu Styles --- */
+        .menu-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            font-size: 24px;
+            color: #8c8cff;
+            z-index: 1001; /* Above everything */
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            background-color: #3f5170; /* Dark menu background */
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.4);
+            z-index: 1000;
+            border-radius: 5px;
+        }
+        .dropdown-content a {
+            color: #e0e0ff;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border-bottom: 1px solid #5a5ac6;
+            cursor: pointer;
+        }
+        .dropdown-content a:hover {
+            background-color: #5a5ac6;
+        }
+
+        /* --- Modal (Pop-up) Styles --- */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 2000; 
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.8); /* Black w/ opacity */
+        }
+        .modal-content {
+            background-color: #2c3855;
+            margin: 10% auto; /* 10% from the top and centered */
+            padding: 20px;
+            border: 1px solid #5a5ac6;
+            width: 80%;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .gallery {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .gallery-item {
+            width: 45%;
+            margin: 10px 0;
+            text-align: center;
+        }
+        .gallery-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            border: 1px solid #5a5ac6;
+        }
+        
+        /* --- Image on Main Page (Structure) --- */
+        .main-structure {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .main-structure img {
+            max-width: 80%;
+            height: auto;
+            border-radius: 5px;
+            border: 1px solid #5a5ac6;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        figcaption {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #a0a0ff;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="menu-icon" onclick="toggleMenu()">☰</div>
+    <div id="myDropdown" class="dropdown-content">
+        <a onclick="showModal()">Project Images</a>
+        <a href="https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME">GitHub Repository</a>
+    </div>
+
+    <div class="container">
+        <h1>Advanced Programming Project: Video Game Library</h1>
+
+        <p>
+            The Video Game Library is a complete two-tier application built using a Client-Server architecture. The **Backend (Server)** is implemented with **Flask**, providing six RESTful HTTP endpoints for managing media data, and ensuring data persistence by storing records in a JSON file. The **Frontend (Client)** is built with **Tkinter** and communicates exclusively with the server via HTTP requests to retrieve, display, create, and delete media items. This project demonstrates modular programming, robust pathing logic, and clean separation of concerns.
+        </p>
+        
+        <figure class="main-structure">
+            <img src="structure.png" alt="Diagram showing the Flask server and Tkinter client communication">
+            <figcaption>Figure 1. The Basic Two-Tier System Structure and Data Flow.</figcaption>
+        </figure>
+    </div>
+    
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2>Project Screenshots</h2>
+            
+            <div class="gallery">
+                
+                <figure class="gallery-item">
+                    <img src="gui_running.png" alt="Screenshot of the running Tkinter GUI application">
+                    <figcaption>Screenshot 1: Frontend GUI Application with Loaded Data.</figcaption>
+                </figure>
+                
+                <figure class="gallery-item">
+                    <img src="server_terminal.png" alt="Screenshot of the Flask server running in the terminal">
+                    <figcaption>Screenshot 2: Backend Flask Server Running in Terminal 1.</figcaption>
+                </figure>
+                
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById("myDropdown").style.display = document.getElementById("myDropdown").style.display === "block" ? "none" : "block";
+        }
+
+        function showModal() {
+            document.getElementById("imageModal").style.display = "block";
+            document.getElementById("myDropdown").style.display = "none";
+        }
+
+        function closeModal() {
+            document.getElementById("imageModal").style.display = "none";
+        }
+
+        // Close the dropdown or modal if the user clicks outside of it
+        window.onclick = function(event) {
+            if (!event.target.matches('.menu-icon')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.style.display === 'block') {
+                        openDropdown.style.display = 'none';
+                    }
+                }
+            }
+            if (event.target == document.getElementById("imageModal")) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
