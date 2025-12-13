@@ -1,9 +1,11 @@
 import tkinter as tk
-from tkinter import messagebox, simpledialog, ttk
+from tkinter import messagebox, simpledialog, ttk, filedialog
 import requests
 import time
 import threading
 import random
+import os
+import csv
 
 # --- CONFIGURATION ---
 API_URL = "http://127.0.0.1:5000/media"
@@ -270,10 +272,36 @@ class NeonLibraryApp:
         self.details_text.config(state="disabled")
 
     def add_game(self):
-        name = simpledialog.askstring("INPUT", "NAME:")
-        if name:
-            requests.post(API_URL, json={"name":name, "author":"Manual", "publisher":"N/A", "category":"PC", "date":"2025"})
-            self.refresh_list()
+        # Bring main window to front
+        self.root.lift()
+        self.root.attributes('-topmost', True)
+        self.root.after_idle(self.root.attributes, '-topmost', False)
+        
+        # Open file dialog for CSV upload
+        file_path = filedialog.askopenfilename(
+            parent=self.root,
+            title="Upload Game Data (CSV)",
+            filetypes=[("CSV files", "*.csv"), ("All files", "*.*")]
+        )
+        
+        if file_path and os.path.exists(file_path):
+            try:
+                # Read CSV and upload each row
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        game_data = {
+                            "name": row.get("name", "Unknown"),
+                            "author": row.get("author", "Unknown"),
+                            "publisher": row.get("publisher", "N/A"),
+                            "category": row.get("category", "PC"),
+                            "date": row.get("date", "2025")
+                        }
+                        requests.post(API_URL, json=game_data)
+                messagebox.showinfo("SUCCESS", f"Games uploaded from {os.path.basename(file_path)}")
+                self.refresh_list()
+            except Exception as e:
+                messagebox.showerror("ERROR", f"Failed to upload: {str(e)}")
 
     def delete_game(self):
         sel = self.game_list.curselection()
